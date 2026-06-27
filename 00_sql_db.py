@@ -163,9 +163,9 @@ def generate_data_for_sql_db():
     df_menu_items = generate_menu_items()
     df_customers = generate_customers(500)
     
-    df_restaurants.to_csv(os.path.join(script_dir, "data", "restaurants.csv"), index=False)
-    df_menu_items.to_csv(os.path.join(script_dir, "data", "menu_items.csv"), index=False)
-    df_customers.to_csv(os.path.join(script_dir, "data", "customers.csv"), index=False)
+    df_restaurants.to_csv(os.path.join(script_dir, "synthetic_data", "restaurants.csv"), index=False)
+    df_menu_items.to_csv(os.path.join(script_dir, "synthetic_data", "menu_items.csv"), index=False)
+    df_customers.to_csv(os.path.join(script_dir, "synthetic_data", "customers.csv"), index=False)
 
     print(f"Generated {len(df_restaurants)} restaurants")
     print(f"Generated {len(df_menu_items)} menu items")

@@ -11,7 +11,7 @@ import json
 # LOAD HISTORICAL ORDERS
 # ============================================
 script_dir = os.path.dirname(os.path.abspath(__file__))
-df_orders = pd.read_csv(os.path.join(script_dir, "data", "historical_orders.csv"))
+df_orders = pd.read_csv(os.path.join(script_dir, "synthetic_data", "historical_orders.csv"))
 
 # ============================================
 # REVIEW TEMPLATES
@@ -156,9 +156,9 @@ def generate_customer_reviews(review_percentage=0.35):
         if len(reviews) % 100 == 0:
             print(f"Generated {len(reviews)} reviews...")
     
-    df_reviews = pd.DataFrame(reviews)
+    df_reviews = pd.pwdFrame(reviews)
     df_reviews = df_reviews.sort_values('review_timestamp').reset_index(drop=True)
-    df_reviews.to_csv(os.path.join(script_dir, "data", "customer_reviews.csv"), index=False)
+    df_reviews.to_csv(os.path.join(script_dir, "synthetic_data", "customer_reviews.csv"), index=False)
     
     # Statistics
     print(f"\n" + "="*60)
