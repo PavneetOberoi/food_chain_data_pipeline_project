@@ -4,7 +4,9 @@ import importlib
 
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    os.makedirs(os.path.join(script_dir, "synthetic_data"), exist_ok=True)
+    project_root = os.path.dirname(script_dir)
+    data_dir = os.path.join(project_root, "synthetic_data")
+    os.makedirs(data_dir, exist_ok=True)
 
     sql_db = importlib.import_module("00_sql_db")
     sql_db.generate_data_for_sql_db()

@@ -11,7 +11,9 @@ import json
 # LOAD HISTORICAL ORDERS
 # ============================================
 script_dir = os.path.dirname(os.path.abspath(__file__))
-df_orders = pd.read_csv(os.path.join(script_dir, "synthetic_data", "historical_orders.csv"))
+project_root = os.path.dirname(script_dir)
+data_dir = os.path.join(project_root, "synthetic_data")
+df_orders = pd.read_csv(os.path.join(data_dir, "historical_orders.csv"))
 
 # ============================================
 # REVIEW TEMPLATES
@@ -71,6 +73,7 @@ def extract_items_from_order(items_json):
     items = json.loads(items_json)
     return [item['name'] for item in items]
 
+
 def format_dishes(dishes_list):
     """Format dish names for review text"""
     if len(dishes_list) == 1:
@@ -80,28 +83,31 @@ def format_dishes(dishes_list):
     else:
         return f"{', '.join(dishes_list[:-1])}, and {dishes_list[-1]}"
 
+
 def generate_review_text(rating, dishes_list):
     """Generate review text based on rating and dishes"""
     template = random.choice(REVIEW_TEMPLATES[rating])
-    
+
     dishes_formatted = format_dishes(dishes_list)
     highlight = random.choice(dishes_list)
-    
+
     review = template.format(
         dishes=dishes_formatted,
         highlight=highlight
     )
-    
+
     return review.replace(',', ' ')
 
 # ============================================
 # GENERATE REVIEWS WITH IMAGES
 # ============================================
+
+
 def generate_customer_reviews(review_percentage=0.35):
     """Generate reviews from historical orders with images"""
-    
+
     reviews = []
-    
+
     # Rating distribution
     rating_weights = {
         5: 0.50,
@@ -110,37 +116,37 @@ def generate_customer_reviews(review_percentage=0.35):
         2: 0.08,
         1: 0.05
     }
-    
+
     ratings_pool = []
     for rating, weight in rating_weights.items():
         ratings_pool.extend([rating] * int(weight * 100))
-    
+
     print(f"\nGenerating reviews from {len(df_orders)} orders...")
     print(f"Target: {review_percentage*100}% of orders will have reviews\n")
-    
+
     image_download_count = 0
-    
+
     for idx, order in df_orders.iterrows():
         # Only 35% of orders get reviews
         if random.random() > review_percentage:
             continue
-        
+
         # Extract dishes from order
         dishes = extract_items_from_order(order['items'])
-        
+
         # Assign rating
         rating = random.choice(ratings_pool)
-        
+
         # Generate review text
         review_text = generate_review_text(rating, dishes)
-        
+
         # Review date: 1-7 days after order
         order_date = datetime.fromisoformat(order['timestamp'])
         review_ts = order_date + timedelta(days=random.randint(1, 7))
-        
+
         # Generate review ID
         review_id = f"REV-{len(reviews) + 1:06d}"
-        
+
         review = {
             "review_id": review_id,
             "order_id": order['order_id'],
@@ -150,16 +156,18 @@ def generate_customer_reviews(review_percentage=0.35):
             "rating": rating,
             "review_timestamp": review_ts.isoformat()
         }
-        
+
         reviews.append(review)
-        
+
         if len(reviews) % 100 == 0:
             print(f"Generated {len(reviews)} reviews...")
-    
-    df_reviews = pd.pwdFrame(reviews)
-    df_reviews = df_reviews.sort_values('review_timestamp').reset_index(drop=True)
-    df_reviews.to_csv(os.path.join(script_dir, "synthetic_data", "customer_reviews.csv"), index=False)
-    
+
+    df_reviews = pd.DataFrame(reviews)
+    df_reviews = df_reviews.sort_values(
+        'review_timestamp').reset_index(drop=True)
+    df_reviews.to_csv(os.path.join(
+        data_dir, "customer_reviews.csv"), index=False)
+
     # Statistics
     print(f"\n" + "="*60)
     print(f"GENERATION COMPLETE")
@@ -168,7 +176,9 @@ def generate_customer_reviews(review_percentage=0.35):
     print(f"Saved to: customer_reviews.csv")
     print(f"\nRating Distribution:")
     print(df_reviews['rating'].value_counts().sort_index())
-    print(f"Date range: {df_reviews['review_timestamp'].min()} to {df_reviews['review_timestamp'].max()}")
+    print(
+        f"Date range: {df_reviews['review_timestamp'].min()} to {df_reviews['review_timestamp'].max()}")
+
 
 # ============================================
 # MAIN

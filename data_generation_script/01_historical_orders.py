@@ -8,12 +8,12 @@ import os
 # LOAD MASTER DATA
 # ============================================
 script_dir = os.path.dirname(os.path.abspath(__file__))
-df_restaurants = pd.read_csv(os.path.join(
-    script_dir, "synthetic_data", "restaurants.csv"))
-df_customers = pd.read_csv(os.path.join(
-    script_dir, "synthetic_data", "customers.csv"))
-df_menu_items = pd.read_csv(os.path.join(
-    script_dir, "synthetic_data", "menu_items.csv"))
+project_root = os.path.dirname(script_dir)
+data_dir = os.path.join(project_root, "synthetic_data")
+
+df_restaurants = pd.read_csv(os.path.join(data_dir, "restaurants.csv"))
+df_customers = pd.read_csv(os.path.join(data_dir, "customers.csv"))
+df_menu_items = pd.read_csv(os.path.join(data_dir, "menu_items.csv"))
 
 RESTAURANTS = df_restaurants['restaurant_id'].tolist()
 CUSTOMERS = df_customers['customer_id'].tolist()
@@ -112,8 +112,8 @@ def generate_historical_orders(num_orders=8000, months_back=6):
     df_orders = df_orders.sort_values('timestamp').reset_index(drop=True)
 
     # Save to CSV
-    df_orders.to_csv(os.path.join(script_dir, "synthetic_data",
-                     "historical_orders.csv"), index=False)
+    df_orders.to_csv(os.path.join(
+        data_dir, "historical_orders.csv"), index=False)
 
     print(f"\nGenerated {len(df_orders)} historical orders")
     print(f"Saved to: historical_orders.csv")
